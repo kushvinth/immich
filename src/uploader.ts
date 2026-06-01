@@ -20,31 +20,7 @@ import {
   loadMergedUploadCache,
   writeUploadCache,
 } from "./upload-cache";
-
-const MEDIA_EXTENSIONS = new Set([
-  "png",
-  "jpg",
-  "jpeg",
-  "gif",
-  "webp",
-  "svg",
-  "avif",
-  "heic",
-  "heif",
-  "bmp",
-  "tiff",
-  "tif",
-  "mp4",
-  "m4v",
-  "mov",
-  "webm",
-  "mkv",
-  "avi",
-  "mpg",
-  "mpeg",
-  "3gp",
-  "ogv",
-]);
+import { MEDIA_EXTENSIONS } from "./media";
 
 export type UploadOptions = {
   forceReupload?: boolean;

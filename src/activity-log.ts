@@ -41,9 +41,9 @@ export class ImmichSyncLogger {
     if (details !== undefined) {
       const detailText = formatDetails(details);
       this.lines.push(`  ${detailText}`);
-      console.log(`${LOG_PREFIX} ${message}`, details);
+      console.debug(`${LOG_PREFIX} ${message}`, details);
     } else {
-      console.log(`${LOG_PREFIX} ${message}`);
+      console.debug(`${LOG_PREFIX} ${message}`);
     }
   }
 

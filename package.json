@@ -1,5 +1,5 @@
 {
-	"name": "immich-photo-sync",
+	"name": "immich-vault-sync",
 	"version": "1.0.0",
 	"description": "Sync vault images to Immich and replace wiki links with public asset URLs.",
 	"main": "main.js",

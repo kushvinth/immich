@@ -2,6 +2,7 @@ import { App, normalizePath } from "obsidian";
 import type { UploadRecord } from "./settings";
 import { LEGACY_DASHBOARD_FOLDER } from "./activity-log";
 import { ensureFolderPath, isUnderFolder, writeVaultNote } from "./vault-write";
+import { buildMediaEmbed, isVideoPath } from "./media";
 
 const DASHBOARD_BASE_FILE = "Meta/Shortcuts/Bases/Immich Assets.base";
 
@@ -131,7 +132,8 @@ function buildAssetNoteContent(assetPath: string, record: UploadRecord, sourceEx
   ];
 
   if (record.url) {
-    lines.push(`![Preview](${record.url})`);
+    const previewPath = record.fileName || assetPath;
+    lines.push(buildMediaEmbed("Preview", record.url, isVideoPath(previewPath)));
     lines.push("");
   }
 

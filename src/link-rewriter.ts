@@ -1,4 +1,5 @@
 import { App, TFile } from "obsidian";
+import { buildMediaEmbed, buildMediaLink, isVideoFile } from "./media";
 
 const WIKI_LINK_REGEX = /(!)?\[\[([^\]]+)\]\]/g;
 
@@ -54,8 +55,9 @@ export async function replaceWikiLinks(
       }
 
       const text = escapeMarkdownText(alias || resolved.basename);
-      const wrappedUrl = `<${url}>`;
-      const replacement = embedFlag ? `![${text}](${wrappedUrl})` : `[${text}](${wrappedUrl})`;
+      const replacement = embedFlag
+        ? buildMediaEmbed(text, url, isVideoFile(resolved))
+        : buildMediaLink(text, url);
 
       linksReplaced += 1;
       changed = true;
