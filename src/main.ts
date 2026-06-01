@@ -1,7 +1,7 @@
 import { Notice, Plugin } from "obsidian";
 import { DEFAULT_SETTINGS, ImmichSettingTab, type PluginSettings } from "./settings";
 import { normalizeImmichUrl, ImmichClient } from "./immich";
-import { uploadFolderImages } from "./uploader";
+import { forceReuploadAll, uploadFolderImages } from "./uploader";
 
 export default class ImmichUploaderPlugin extends Plugin {
   settings: PluginSettings;
@@ -13,9 +13,14 @@ export default class ImmichUploaderPlugin extends Plugin {
 
     this.addCommand({
       id: "immich-upload-folder",
-        name: "Immich: upload images from configured folder and replace links",
+        name: "Immich: upload media from configured folder and replace links",
       callback: async () => {
-        await uploadFolderImages(this.app, this.settings, this.saveSettings.bind(this));
+        await uploadFolderImages(
+          this.app,
+          this.settings,
+          this.saveSettings.bind(this),
+          this.manifest.id,
+        );
       },
     });
 
@@ -24,6 +29,19 @@ export default class ImmichUploaderPlugin extends Plugin {
         name: "Immich: test connection",
       callback: async () => {
         await this.testConnection();
+      },
+    });
+
+    this.addCommand({
+      id: "immich-force-reupload",
+      name: "Immich: force re-upload all (clears cache)",
+      callback: async () => {
+        await forceReuploadAll(
+          this.app,
+          this.settings,
+          this.saveSettings.bind(this),
+          this.manifest.id,
+        );
       },
     });
   }
@@ -42,6 +60,8 @@ export default class ImmichUploaderPlugin extends Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<PluginSettings>);
     this.settings.immichUrl = normalizeImmichUrl(this.settings.immichUrl);
     this.settings.uploadedAssets ||= {};
+    this.settings.showSyncLog ??= true;
+    this.settings.dashboardFolder ??= "";
   }
 
   async saveSettings() {

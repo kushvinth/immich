@@ -1,5 +1,6 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 import type ImmichUploaderPlugin from "./main";
+import { clearUploadCache, clearUploadedAssetsInSettings } from "./upload-cache";
 
 export type LinkStyle = "preview" | "original";
 export type ReplaceScope = "vault" | "folder";
@@ -23,9 +24,13 @@ export interface PluginSettings {
 	albumId: string;
 	albumShareKey: string;
 	imageFolder: string;
+	/** Override; default is `{imageFolder}/Assets-Base-Data`. */
+	dashboardFolder: string;
 	includeSubfolders: boolean;
 	linkStyle: LinkStyle;
 	replaceScope: ReplaceScope;
+	/** Show sync log modal and write Immich Sync Log.md after each run. */
+	showSyncLog: boolean;
 	uploadedAssets: Record<string, UploadRecord>;
 }
 
@@ -36,9 +41,11 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	albumId: "",
 	albumShareKey: "",
 	imageFolder: "Meta/Media",
+	dashboardFolder: "",
 	includeSubfolders: true,
 	linkStyle: "original",
 	replaceScope: "vault",
+	showSyncLog: true,
 	uploadedAssets: {},
 };
 
@@ -117,12 +124,12 @@ export class ImmichSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Image discovery")
-			.setDesc("Configure which vault folder is scanned for image uploads.");
+			.setName("Media discovery")
+			.setDesc("Configure which vault folder is scanned for image and video uploads.");
 
 		new Setting(containerEl)
-			.setName("Image folder")
-			.setDesc("Vault-relative path (for example, meta/media).")
+			.setName("Media folder")
+			.setDesc("Vault-relative path (for example, meta/media). Images and videos in this folder are uploaded.")
 			.addText((text) =>
 				text
 					.setPlaceholder("For example, meta/media")
@@ -131,6 +138,31 @@ export class ImmichSettingTab extends PluginSettingTab {
 						this.plugin.settings.imageFolder = value.trim();
 						await this.plugin.saveSettings();
 					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Asset dashboard folder")
+			.setDesc(
+				"Metadata notes (preview, Immich URL, frontmatter) are written here. Leave empty to use {media folder}/asset/base/data.",
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("For example, meta/media/asset/base/data")
+					.setValue(this.plugin.settings.dashboardFolder)
+					.onChange(async (value) => {
+						this.plugin.settings.dashboardFolder = value.trim();
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Show sync log")
+			.setDesc("After each upload, open a log window and update Immich Sync Log.md in the media folder.")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.showSyncLog).onChange(async (value) => {
+					this.plugin.settings.showSyncLog = value;
+					await this.plugin.saveSettings();
+				}),
 			);
 
 		new Setting(containerEl)
@@ -167,6 +199,21 @@ export class ImmichSettingTab extends PluginSettingTab {
 				button.setButtonText("Test");
 				button.onClick(async () => {
 					await this.plugin.testConnection();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName("Clear upload cache")
+			.setDesc(
+				"Use if files show as skipped but are missing from Immich. Clears cached upload state; run Force re-upload next.",
+			)
+			.addButton((button) => {
+				button.setButtonText("Clear cache");
+				button.onClick(async () => {
+					await clearUploadCache(this.app, this.plugin.manifest.id);
+					clearUploadedAssetsInSettings(this.plugin.settings);
+					await this.plugin.saveSettings();
+					new Notice("Immich upload cache cleared.");
 				});
 			});
 	}

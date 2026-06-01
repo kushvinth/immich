@@ -292,6 +292,16 @@ function guessMimeType(extension: string): string {
     bmp: "image/bmp",
     tiff: "image/tiff",
     tif: "image/tiff",
+    mp4: "video/mp4",
+    m4v: "video/x-m4v",
+    mov: "video/quicktime",
+    webm: "video/webm",
+    mkv: "video/x-matroska",
+    avi: "video/x-msvideo",
+    mpg: "video/mpeg",
+    mpeg: "video/mpeg",
+    "3gp": "video/3gpp",
+    ogv: "video/ogg",
   };
 
   return map[lower] ?? "application/octet-stream";
