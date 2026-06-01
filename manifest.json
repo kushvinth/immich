@@ -3,7 +3,7 @@
 	"name": "Immich Photo Sync",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Upload images from a configured vault folder to Immich and replace wiki links with public asset URLs.",
+	"description": "Upload images and videos from a configured vault folder to Immich and replace wiki links with public asset URLs.",
 	"author": "kushvinth",
 	"isDesktopOnly": false
 }

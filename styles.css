@@ -1,8 +1,22 @@
-/*
+.immich-sync-log-modal .immich-sync-log-summary {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.immich-sync-log-modal .immich-sync-log-body {
+  max-height: 60vh;
+  overflow: auto;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  font-size: var(--font-ui-smaller);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
-If your plugin does not need CSS, delete this file.
-
-*/
+.immich-sync-log-modal .immich-sync-log-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
